@@ -55,14 +55,7 @@ const SinglePlaylist = ({ route }) => {
             sharedTransitionTag={`image-${item._id}`}
           />
         </View>
-        <View>
-          <Text style={{ color: "#fff" }}>SinglePlaylist</Text>
-          <Animated.Image
-            source={{ uri: item.image }}
-            style={{ width: 270, height: 270, marginTop: 90 }}
-            sharedTransitionTag={`image-${item._id}`}
-          />
-        </View>
+       
       </SafeAreaView>
     </ScrollView>
 
