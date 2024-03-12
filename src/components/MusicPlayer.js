@@ -10,7 +10,7 @@ import {
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { Audio } from "expo-av";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const MusicPlayer = () => {
   const navigation = useNavigation();
@@ -18,7 +18,10 @@ const MusicPlayer = () => {
   const [playMode, setPlayMode] = useState(false);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const songState = useSelector((state) => state.musicReducer.song);
+  const track = useSelector((state) => state.trackReducer.track);
+  console.log(track)
 
   async function loadSound() {
     await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
@@ -35,10 +38,10 @@ const MusicPlayer = () => {
     });
     setSound(sound);
     console.log(sound);
-    dispatch({
-      type: "setmusic",
-      value: sound
-    });
+    // dispatch({
+    //   type: "setmusic",
+    //   value: sound,
+    // });
   }
 
   useEffect(() => {
@@ -46,6 +49,7 @@ const MusicPlayer = () => {
   }, []);
 
   async function playSound() {
+   
     if (!playMode) {
       console.log(sound);
       await sound.playAsync();
@@ -57,25 +61,44 @@ const MusicPlayer = () => {
     }
   }
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        display: track ? "flex" : "none",
+        width: "96%",
+        justifyContent: "space-between",
+        backgroundColor: "#454547",
+        position: "absolute",
+        borderRadius: 9,
+        bottom: 80,
+        left: 7,
+        zIndex: 999999,
+        flexDirection: "row",
+        padding: 6,
+      }}
+    >
       <Pressable onPress={() => navigation.navigate("Single")}>
         <View style={styles.imageContainer}>
           <View>
             <Image
-              source={require("../../assets/adaptive-icon.png")}
+              source={{uri: track?.image}}
               style={styles.image}
             />
           </View>
           <View>
-            <Text style={{ color: "#fff" }}>Yak</Text>
-            <Text style={{ color: "#bababa" }}>Ahsen Almaz</Text>
+            <Text style={{ color: "#fff" }}>{track?.name}</Text>
+            <Text style={{ color: "#bababa" }}>{track?.singer}</Text>
           </View>
         </View>
       </Pressable>
       <View style={styles.icons}>
         <MaterialIcons name="cast" size={23} color={"#fff"} />
         <AntDesign name="hearto" size={23} color={"#fff"} />
-        <FontAwesome5 name="play" onPress={() => playSound()} size={23} color={"#fff"} />
+        <FontAwesome5
+          name="play"
+          onPress={() => playSound()}
+          size={23}
+          color={"#fff"}
+        />
       </View>
     </View>
   );
@@ -84,19 +107,7 @@ const MusicPlayer = () => {
 export default MusicPlayer;
 
 const styles = StyleSheet.create({
-  container: {
-    display: "flex",
-    width: "96%",
-    justifyContent: "space-between",
-    backgroundColor: "#454547",
-    position: "absolute",
-    borderRadius: 9,
-    bottom: 80,
-    left: 7,
-    zIndex: 999999,
-    flexDirection: "row",
-    padding: 6,
-  },
+ 
   imageContainer: {
     flexDirection: "row",
     gap: 5,

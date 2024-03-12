@@ -7,15 +7,18 @@ import {
   FlatList,
   SafeAreaView,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { getSongAll } from "../config/API";
 import Music from "../components/posts/Music";
 import Topbar from "../components/home/Topbar";
+import { useDispatch } from "react-redux";
 
 function HomeScreen() {
   const [song, setSong] = useState([]);
   const [message, setMessage] = useState("amir");
 
+  const dispatch = useDispatch();
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
     setSong(songData.data);
@@ -24,11 +27,10 @@ function HomeScreen() {
 
   useEffect(() => {
     getSong();
-  
   }, [getSong]);
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView  showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Topbar />
         <View style={styles.labelContainer}>
           <View style={styles.label}>
@@ -54,7 +56,18 @@ function HomeScreen() {
             style={{ marginTop: 10 }}
             showsHorizontalScrollIndicator={false}
             data={song}
-            renderItem={({ item }) => <Music music={item} />}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => {
+                  dispatch({
+                    type: "settrack",
+                    value: item,
+                  })
+                }}
+              >
+                <Music music={item} />
+              </Pressable>
+            )}
             keyExtractor={(item) => item._id}
           />
         </View>
