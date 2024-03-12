@@ -19,9 +19,10 @@ const MusicPlayer = () => {
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   const dispatch = useDispatch();
-  const songState = useSelector((state) => state.musicReducer.song);
+  const play = useSelector((state) => state.playReducer.play);
+  const song = useSelector((state) => state.musicReducer.song);
   const track = useSelector((state) => state.trackReducer.track);
-  console.log(track)
+  console.log(track);
 
   async function loadSound() {
     await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
@@ -38,10 +39,10 @@ const MusicPlayer = () => {
     });
     setSound(sound);
     console.log(sound);
-    // dispatch({
-    //   type: "setmusic",
-    //   value: sound,
-    // });
+    dispatch({
+      type: "setmusic",
+      value: sound,
+    });
   }
 
   useEffect(() => {
@@ -49,15 +50,18 @@ const MusicPlayer = () => {
   }, []);
 
   async function playSound() {
-   
-    if (!playMode) {
-      console.log(sound);
-      await sound.playAsync();
-      setPlayMode(true);
+    if (!play) {
+      console.log(song);
+      await song.playAsync();
+      dispatch({
+        type: "play",
+      });
     } else {
-      setPlayMode(false);
+      dispatch({
+        type: "pause",
+      });
       console.log("Pause Sound");
-      await sound.pauseAsync();
+      await song.pauseAsync();
     }
   }
   return (
@@ -79,10 +83,7 @@ const MusicPlayer = () => {
       <Pressable onPress={() => navigation.navigate("Single")}>
         <View style={styles.imageContainer}>
           <View>
-            <Image
-              source={{uri: track?.image}}
-              style={styles.image}
-            />
+            <Image source={{ uri: track?.image }} style={styles.image} />
           </View>
           <View>
             <Text style={{ color: "#fff" }}>{track?.name}</Text>
@@ -93,13 +94,32 @@ const MusicPlayer = () => {
       <View style={styles.icons}>
         <MaterialIcons name="cast" size={23} color={"#fff"} />
         <AntDesign name="hearto" size={23} color={"#fff"} />
-        <FontAwesome5
-          name="play"
-          onPress={() => playSound()}
-          size={23}
-          color={"#fff"}
-        />
+        {play ? (
+          <FontAwesome5
+            name="pause"
+            onPress={() => playSound()}
+            size={23}
+            color={"#fff"}
+          />
+        ) : (
+          <FontAwesome5
+            name="play"
+            onPress={() => playSound()}
+            size={23}
+            color={"#fff"}
+          />
+        )}
       </View>
+      <View
+        style={{
+          width: "60%",
+          height: 1.3,
+          backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 1,
+          left: 8,
+        }}
+      ></View>
     </View>
   );
 };
@@ -107,7 +127,6 @@ const MusicPlayer = () => {
 export default MusicPlayer;
 
 const styles = StyleSheet.create({
- 
   imageContainer: {
     flexDirection: "row",
     gap: 5,

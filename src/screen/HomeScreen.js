@@ -8,15 +8,21 @@ import {
   SafeAreaView,
   ScrollView,
   Pressable,
+  Touchable,
+  TouchableOpacity,
 } from "react-native";
 import { getSongAll } from "../config/API";
 import Music from "../components/posts/Music";
 import Topbar from "../components/home/Topbar";
 import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/core";
+import Animated from "react-native-reanimated";
 
 function HomeScreen() {
   const [song, setSong] = useState([]);
   const [message, setMessage] = useState("amir");
+
+  const navigator = useNavigation();
 
   const dispatch = useDispatch();
   const getSong = useCallback(async () => {
@@ -62,7 +68,7 @@ function HomeScreen() {
                   dispatch({
                     type: "settrack",
                     value: item,
-                  })
+                  });
                 }}
               >
                 <Music music={item} />
@@ -87,7 +93,13 @@ function HomeScreen() {
             style={{ marginTop: 10 }}
             showsHorizontalScrollIndicator={false}
             data={song}
-            renderItem={({ item }) => <Music music={item} />}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => navigator.navigate("SinglePlaylist", { item })}
+              >
+                <Music music={item} />
+              </Pressable>
+            )}
             keyExtractor={(item) => item._id}
           />
         </View>
@@ -107,12 +119,27 @@ function HomeScreen() {
             style={{ marginTop: 10 }}
             showsHorizontalScrollIndicator={false}
             data={song}
-            renderItem={({ item }) => <Music music={item} />}
+            renderItem={({ item }) => (
+              <TouchableOpacity  onPress={() => navigator.navigate("SinglePlaylist", { item })}>
+                <Animated.Image
+                  source={{ uri: item.image }}
+                  style={{
+                    width: 153,
+                    height: 150,
+                    objectFit: "cover",
+                    borderWidth: 1,
+                    borderRadius: 3,
+                    borderColor: "rgba(255,255,255,0.2)",
+                  }}
+                  sharedTransitionTag={`image-${item._id}`}
+                />
+              </TouchableOpacity>
+            )}
             keyExtractor={(item) => item._id}
           />
         </View>
       </ScrollView>
-      <StatusBar style="light" backgroundColor="black" animated={true} />
+      <StatusBar style="black" backgroundColor="black" animated={true} />
     </SafeAreaView>
   );
 }

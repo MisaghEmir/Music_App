@@ -9,6 +9,7 @@ import {
 } from "@expo/vector-icons";
 import HomeScreen from "../screen/HomeScreen";
 import MusicPlayer from "../components/MusicPlayer"
+import SinglePlaylist from "../screen/SinglePlaylist";
 
 
 function TabNavigator() {
@@ -88,6 +89,10 @@ function TabNavigator() {
                 </View>
               ),
             }}
+          />
+          <Tab.Group
+            name="SinglePlaylist"
+            component={SinglePlaylist}
           />
         </Tab.Navigator>
     </>

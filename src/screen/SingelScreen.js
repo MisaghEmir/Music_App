@@ -21,7 +21,7 @@ import {
   FontAwesome5,
 } from "@expo/vector-icons";
 import { getSongAll } from "../config/API";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 // import SetupPlayer from "../../SetupPlayer";
 // import TrackPlayer from "react-native-track-player";
@@ -30,7 +30,8 @@ const SingelScreen = () => {
   const [song, setSong] = useState([]);
   const [message, setMessage] = useState("amir");
   const songState = useSelector((state) => state.musicReducer.song);
-  const playMode = useSelector((state) => state.playReducer.play);
+  const play = useSelector((state) => state.playReducer.play);
+  const track = useSelector((state) => state.trackReducer.track);
   console.log(songState);
 
   const getSong = useCallback(async () => {
@@ -40,15 +41,20 @@ const SingelScreen = () => {
     // await SetupPlayer(songData.data);
     setMessage(songData.message);
   }, []);
+  const dispatch = useDispatch();
 
-  async function play() {
-    console.log("play");
-    console.log("play");
-    console.log(songState);
-    if (!playMode) {
-      console.log(songState);
-      await songState.playAsync();
+  async function playSound() {
+    if (!play) {
+      console.log(songState)
+      console.log(play)
+      dispatch({
+        type: "play",
+      })
+      await songState.playAsync()
     } else {
+      dispatch({
+        type: "pause",
+      });
       console.log("Pause Sound");
       await songState.pauseAsync();
     }
@@ -71,7 +77,7 @@ const SingelScreen = () => {
     >
       <Header />
       <Image
-        source={require("../../assets/adaptive-icon.png")}
+        source={{ uri: track?.image }}
         style={{
           width: "100%",
           height: 320,
@@ -92,7 +98,7 @@ const SingelScreen = () => {
           <View>
             <AntDesign name="stepbackward" size={30} color={"#fff"} />
           </View>
-          <View
+          <Pressable
             style={{
               width: 70,
               height: 70,
@@ -101,11 +107,24 @@ const SingelScreen = () => {
               alignItems: "center",
               justifyContent: "center",
             }}
+            onPress={() => playSound()}
           >
-            <Pressable onPress={play}>
-              <FontAwesome5 name="play" size={20} color={"#000"} />
-            </Pressable>
-          </View>
+            {play ? (
+              <FontAwesome5
+               
+                name="pause"
+                size={20}
+                color={"#000"}
+              />
+            ) : (
+              <FontAwesome5
+              
+                name="play"
+                size={20}
+                color={"#000"}
+              />
+            )}
+          </Pressable>
           <View>
             <AntDesign name="stepforward" size={30} color={"#fff"} />
           </View>
