@@ -11,29 +11,86 @@ import {
   Touchable,
   TouchableOpacity,
 } from "react-native";
-import { getSongAll } from "../config/API";
+import { getPlaylistAll, getSongAll } from "../config/API";
 import Music from "../components/posts/Music";
 import Topbar from "../components/home/Topbar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/core";
 import Animated from "react-native-reanimated";
+import { Audio } from "expo-av";
 
 function HomeScreen() {
   const [song, setSong] = useState([]);
+  const [playlist, setPlaylist] = useState([]);
   const [message, setMessage] = useState("amir");
 
   const navigator = useNavigation();
 
+  const songState = useSelector((state) => state.musicReducer.song);
+
   const dispatch = useDispatch();
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
+    const playlistData = await getPlaylistAll()
     setSong(songData.data);
+    setPlaylist(playlistData.data);
     setMessage(songData.message);
   }, []);
 
   useEffect(() => {
     getSong();
   }, [getSong]);
+
+  const selectMusic = async (track) => {
+    await songState?.pauseAsync();
+    dispatch({
+      type: "null",
+    });
+
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+    });
+
+    const { sound, status } = await Audio.Sound.createAsync(
+      {
+        // uri: "https://kurdsong.storage.iran.liara.space/song/music/1708997285873-935193250.mp3",
+        uri: track.music,
+      },
+      {
+        shouldPlay: true,
+        isLooping: false,
+      },
+      onPlaybackStatusUpdate
+    );
+    console.log(sound);
+    onPlaybackStatusUpdate(status);
+    const progress = status;
+    console.log("status", status);
+    // console.log("Loading Sound", sound._loaded);
+    dispatch({
+      type: "setmusic",
+      value: sound,
+    });
+    dispatch({
+      type: "play",
+    });
+    dispatch({
+      type: "settrack",
+      value: track,
+    });
+  };
+  const onPlaybackStatusUpdate = (status) => {
+    console.log(status);
+    if (status.isLoaded && status.isPlaying) {
+      const progress = status.positionMillis / status.durationMillis;
+
+      dispatch({
+        type: "setstatus",
+        value: progress,
+      });
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -63,14 +120,7 @@ function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             data={song}
             renderItem={({ item }) => (
-              <Pressable
-                onPress={() => {
-                  dispatch({
-                    type: "settrack",
-                    value: item,
-                  });
-                }}
-              >
+              <Pressable onPress={() => selectMusic(item)}>
                 <Music music={item} />
               </Pressable>
             )}
@@ -92,7 +142,7 @@ function HomeScreen() {
             horizontal={true}
             style={{ marginTop: 10 }}
             showsHorizontalScrollIndicator={false}
-            data={song}
+            data={playlist}
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => navigator.navigate("SinglePlaylist", { item })}
@@ -120,7 +170,9 @@ function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             data={song}
             renderItem={({ item }) => (
-              <TouchableOpacity  onPress={() => navigator.navigate("SinglePlaylist", { item })}>
+              <TouchableOpacity
+                onPress={() => navigator.navigate("SinglePlaylist", { item })}
+              >
                 <Animated.Image
                   source={{ uri: item.image }}
                   style={{

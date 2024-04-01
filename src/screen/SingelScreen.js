@@ -32,6 +32,7 @@ const SingelScreen = () => {
   const songState = useSelector((state) => state.musicReducer.song);
   const play = useSelector((state) => state.playReducer.play);
   const track = useSelector((state) => state.trackReducer.track);
+  const status = useSelector((state) => state.musicReducer.status);
   console.log(songState);
 
   const getSong = useCallback(async () => {
@@ -45,12 +46,12 @@ const SingelScreen = () => {
 
   async function playSound() {
     if (!play) {
-      console.log(songState)
-      console.log(play)
+      console.log(songState);
+      console.log(play);
       dispatch({
         type: "play",
-      })
-      await songState.playAsync()
+      });
+      await songState.playAsync();
     } else {
       dispatch({
         type: "pause",
@@ -90,6 +91,26 @@ const SingelScreen = () => {
           <Text style={{ color: "#fff" }}>Yak</Text>
           <Text style={{ color: "#bababa" }}>Ahsen Almaz</Text>
         </View>
+        <View style={styles.progressContainer}>
+          <View
+            style={{
+              width: `${status * 100}%`,
+              height: "100%",
+              backgroundColor: "#fff",
+            }}
+          ></View>
+          <Pressable
+            style={{
+              position: "absolute",
+              width: 12,
+              height: 12,
+              borderRadius: 50,
+              backgroundColor: "#fff",
+              left: `${status * 100}%`,
+              top: -4,
+            }}
+          ></Pressable>
+        </View>
         <View></View>
         <View style={styles.play}>
           <View>
@@ -110,19 +131,9 @@ const SingelScreen = () => {
             onPress={() => playSound()}
           >
             {play ? (
-              <FontAwesome5
-               
-                name="pause"
-                size={20}
-                color={"#000"}
-              />
+              <FontAwesome5 name="pause" size={20} color={"#000"} />
             ) : (
-              <FontAwesome5
-              
-                name="play"
-                size={20}
-                color={"#000"}
-              />
+              <FontAwesome5 name="play" size={20} color={"#000"} />
             )}
           </Pressable>
           <View>
@@ -163,7 +174,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   player: {
-    marginTop: 50,
+    marginTop: 30,
+  },
+  progressContainer: {
+    marginVertical: 20,
+    borderRadius: 6,
+    width: "100%",
+    height: 4,
+    position: "relative",
+    backgroundColor: "#bababa",
+  },
+  progress: {
+    width: "30%",
+    height: "100%",
+    backgroundColor: "#fff",
+  },
+  progressThump: {
+    position: "absolute",
+    width: 12,
+    height: 12,
+    borderRadius: 50,
+    backgroundColor: "#fff",
+    left: "30%",
+    top: -4,
   },
   play: {
     flexDirection: "row",
