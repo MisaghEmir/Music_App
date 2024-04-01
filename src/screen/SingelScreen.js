@@ -23,6 +23,7 @@ import {
 import { getSongAll } from "../config/API";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/core";
+import { Audio } from "expo-av";
 
 // import SetupPlayer from "../../SetupPlayer";
 // import TrackPlayer from "react-native-track-player";
@@ -33,10 +34,11 @@ const SingelScreen = () => {
   const songState = useSelector((state) => state.musicReducer.song);
   const play = useSelector((state) => state.playReducer.play);
   const track = useSelector((state) => state.trackReducer.track);
+  const list = useSelector((state) => state.listReducer.list);
   const status = useSelector((state) => state.musicReducer.status);
   console.log(songState);
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
@@ -67,6 +69,115 @@ const SingelScreen = () => {
   useEffect(() => {
     getSong();
   }, [getSong]);
+
+  const handleNextTrack = async () => {
+    dispatch({
+      type: "null",
+    });
+    dispatch({
+      type: "pause",
+    });
+    await songState.pauseAsync();
+    let index = 0;
+    list.forEach((item, i) => {
+      if (item._id === track._id) {
+        index = i;
+      }
+    });
+    // if (random) {
+    //   index = parseInt(Math.random() * (list.length - 1 - 0 + 0));
+    // }
+    let music = index + 1 === list.length ? list[0] : list[index + 1];
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+    });
+
+  
+    dispatch({
+      type: "setlist",
+      value: list,
+    });
+    dispatch({
+      type: "settrack",
+      value: music,
+    });
+    const { sound, status } = await Audio.Sound.createAsync(
+      {
+        // uri: "https://kurdsong.storage.iran.liara.space/song/music/1708997285873-935193250.mp3",
+        uri: music.music,
+      },
+      {
+        shouldPlay: true,
+        isLooping: false,
+      },
+      onPlaybackStatusUpdate
+    );
+    onPlaybackStatusUpdate(status);
+    dispatch({
+      type: "play",
+    });
+    dispatch({
+      type: "setmusic",
+      value: sound,
+    });
+  };
+
+  const handlePrevTrack = async () => {
+    dispatch({
+      type: "null",
+    });
+    dispatch({
+      type: "pause",
+    });
+    await songState.pauseAsync();
+    let index = 0;
+    list.forEach((item, i) => {
+      if (item._id === track._id) {
+        index = i;
+      }
+    });
+    let music = index === 0 ? list[list.length - 1] : list[index - 1];
+    const { sound, status } = await Audio.Sound.createAsync(
+      {
+        // uri: "https://kurdsong.storage.iran.liara.space/song/music/1708997285873-935193250.mp3",
+        uri: music.music,
+      },
+      {
+        shouldPlay: true,
+        isLooping: false,
+      },
+      onPlaybackStatusUpdate
+    );
+    onPlaybackStatusUpdate(status);
+    dispatch({
+      type: "setmusic",
+      value: sound,
+    });
+    dispatch({
+      type: "play",
+    });
+    dispatch({
+      type: "setlist",
+      value: list,
+    });
+    dispatch({
+      type: "settrack",
+      value: music,
+    });
+  };
+
+  const onPlaybackStatusUpdate = (status) => {
+    if (status.isLoaded && status.isPlaying) {
+      const progress = status.positionMillis / status.durationMillis;
+
+      dispatch({
+        type: "setstatus",
+        value: progress,
+      });
+    }
+  };
+
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -91,13 +202,13 @@ const SingelScreen = () => {
       />
       <View style={styles.player}>
         <View>
-          <Text style={{ color: "#fff" }}>Yak</Text>
-          <Text style={{ color: "#bababa" }}>Ahsen Almaz</Text>
+          <Text style={{ color: "#fff" }}>{track.name}</Text>
+          <Text style={{ color: "#bababa" }}>{track?.singer}</Text>
         </View>
         <View style={styles.progressContainer}>
           <View
             style={{
-              width: `${status * 100}%`,
+              width: status ? `${status * 100}%` : "0%",
               height: "100%",
               backgroundColor: "#fff",
             }}
@@ -119,9 +230,9 @@ const SingelScreen = () => {
           <View>
             <AntDesign name="hearto" size={20} color={"#fff"} />
           </View>
-          <View>
+          <Pressable onPress={() => handlePrevTrack()}>
             <AntDesign name="stepbackward" size={30} color={"#fff"} />
-          </View>
+          </Pressable>
           <Pressable
             style={{
               width: 70,
@@ -139,9 +250,9 @@ const SingelScreen = () => {
               <FontAwesome5 name="play" size={20} color={"#000"} />
             )}
           </Pressable>
-          <View>
+          <Pressable onPress={() => handleNextTrack()}>
             <AntDesign name="stepforward" size={30} color={"#fff"} />
-          </View>
+          </Pressable>
           <Pressable onPress={() => navigation.navigate("listmanu")}>
             <Entypo name="add-to-list" size={20} color={"#fff"} />
           </Pressable>
@@ -192,7 +303,7 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#fff",
     borderRadius: 15,
-    left: 0
+    left: 0,
   },
   progressThump: {
     position: "absolute",

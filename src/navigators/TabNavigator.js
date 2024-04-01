@@ -10,6 +10,7 @@ import {
 import HomeScreen from "../screen/HomeScreen";
 import MusicPlayer from "../components/MusicPlayer";
 import SinglePlaylist from "../screen/SinglePlaylist";
+import SearchScreen from "../screen/SearchScreen";
 
 function TabNavigator() {
   const Tab = createBottomTabNavigator();
@@ -49,7 +50,7 @@ function TabNavigator() {
 
         <Tab.Screen
           name="Search"
-          component={HomeScreen}
+          component={SearchScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="search" size={size} color={color} />

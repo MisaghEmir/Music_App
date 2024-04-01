@@ -14,16 +14,15 @@ const MusicPlayer = ({ route }) => {
   const track = useSelector((state) => state.trackReducer.track);
   console.log(track);
 
-  const progress = status?.positionMillis;
 
   useEffect(() => {
     // playSound();
-    console.log("Progress", status);
   });
+
+
 
   async function playSound() {
     if (!play) {
-      console.log(song);
       await song.playAsync();
       dispatch({
         type: "play",

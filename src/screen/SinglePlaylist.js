@@ -32,7 +32,6 @@ const SinglePlaylist = ({ route }) => {
   const songState = useSelector((state) => state.musicReducer.song);
   const dispatch = useDispatch();
   const { item } = route.params;
-  console.log("item", item);
   const scrollRef = useAnimatedRef();
 
   const scrollHandler = useScrollViewOffset(scrollRef);
@@ -50,7 +49,6 @@ const SinglePlaylist = ({ route }) => {
       type: "null",
     });
     const track = song[0];
-    console.log("track", track);
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
       staysActiveInBackground: true,
@@ -238,6 +236,7 @@ const styles = StyleSheet.create({
     height: 240,
     borderWidth: 1,
     borderRadius: 2,
+    objectFit: "cover",
     borderColor: "rgba(255,255,255,0.1)",
   },
   titleContainer: {

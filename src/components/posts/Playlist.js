@@ -2,8 +2,7 @@ import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 import Animated from "react-native-reanimated";
 
-const Music = ({ music }) => {
- 
+const Playlist = ({ music }) => {
   return (
     <View style={styles.container}>
       <View>
@@ -22,13 +21,17 @@ const Music = ({ music }) => {
       </View>
       <View>
         <Text style={styles.title}>{music.name}</Text>
-        <Text style={{ color: "#bababa" }}>{music.singer}</Text>
+        <View style={{ color: "#bababa", flexDirection: "row" }}>
+          {music.singersarray.map((item, index) => (
+            <Text style={{ color: "#bababa" }} key={index}>{item.name}, </Text>
+          ))}
+        </View>
       </View>
     </View>
   );
 };
 
-export default Music;
+export default Playlist;
 
 const styles = StyleSheet.create({
   container: {

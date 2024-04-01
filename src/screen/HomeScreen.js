@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/core";
 import Animated from "react-native-reanimated";
 import { Audio } from "expo-av";
+import Playlist from "../components/posts/Playlist";
 
 function HomeScreen() {
   const [song, setSong] = useState([]);
@@ -63,7 +64,6 @@ function HomeScreen() {
       },
       onPlaybackStatusUpdate
     );
-    console.log(sound);
     onPlaybackStatusUpdate(status);
     dispatch({
       type: "setmusic",
@@ -109,10 +109,10 @@ function HomeScreen() {
               color: "#fff",
               fontSize: 24,
               fontWeight: "700",
-              marginTop: 20,
+              marginTop: 30,
             }}
           >
-            Try something else
+            Recently played
           </Text>
           <FlatList
             horizontal={true}
@@ -133,7 +133,7 @@ function HomeScreen() {
               color: "#fff",
               fontSize: 24,
               fontWeight: "700",
-              marginTop: 7,
+              marginTop: 20,
             }}
           >
             Try something else
@@ -147,7 +147,7 @@ function HomeScreen() {
               <Pressable
                 onPress={() => navigator.navigate("SinglePlaylist", { item })}
               >
-                <Music music={item} />
+                <Playlist music={item} />
               </Pressable>
             )}
             keyExtractor={(item) => item._id}
@@ -159,10 +159,10 @@ function HomeScreen() {
               color: "#fff",
               fontSize: 24,
               fontWeight: "700",
-              marginTop: 7,
+              marginTop: 20,
             }}
           >
-            Try something else
+            Fresh new music
           </Text>
           <FlatList
             horizontal={true}
@@ -170,22 +170,9 @@ function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             data={song}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => navigator.navigate("SinglePlaylist", { item })}
-              >
-                <Animated.Image
-                  source={{ uri: item.image }}
-                  style={{
-                    width: 153,
-                    height: 150,
-                    objectFit: "cover",
-                    borderWidth: 1,
-                    borderRadius: 3,
-                    borderColor: "rgba(255,255,255,0.2)",
-                  }}
-                  sharedTransitionTag={`image-${item._id}`}
-                />
-              </TouchableOpacity>
+              <Pressable onPress={() => selectMusic(item)}>
+              <Music music={item} />
+            </Pressable>
             )}
             keyExtractor={(item) => item._id}
           />
@@ -199,7 +186,7 @@ function HomeScreen() {
 export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     backgroundColor: "#000",
     flex: 1,
