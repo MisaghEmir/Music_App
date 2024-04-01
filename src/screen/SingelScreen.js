@@ -22,6 +22,7 @@ import {
 } from "@expo/vector-icons";
 import { getSongAll } from "../config/API";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/core";
 
 // import SetupPlayer from "../../SetupPlayer";
 // import TrackPlayer from "react-native-track-player";
@@ -34,6 +35,8 @@ const SingelScreen = () => {
   const track = useSelector((state) => state.trackReducer.track);
   const status = useSelector((state) => state.musicReducer.status);
   console.log(songState);
+
+  const navigation = useNavigation()
 
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
@@ -139,9 +142,9 @@ const SingelScreen = () => {
           <View>
             <AntDesign name="stepforward" size={30} color={"#fff"} />
           </View>
-          <View>
+          <Pressable onPress={() => navigation.navigate("listmanu")}>
             <Entypo name="add-to-list" size={20} color={"#fff"} />
-          </View>
+          </Pressable>
         </View>
         <View
           style={{
@@ -188,6 +191,8 @@ const styles = StyleSheet.create({
     width: "30%",
     height: "100%",
     backgroundColor: "#fff",
+    borderRadius: 15,
+    left: 0
   },
   progressThump: {
     position: "absolute",

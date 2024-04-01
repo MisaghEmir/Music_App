@@ -15,7 +15,7 @@ function TabNavigator() {
   const Tab = createBottomTabNavigator();
   return (
     <>
-      <MusicPlayer />
+      <MusicPlayer route={"tab"} />
       <Tab.Navigator
         screenOptions={{
           headerShown: false,

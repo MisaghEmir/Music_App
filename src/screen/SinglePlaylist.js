@@ -20,6 +20,8 @@ import { useNavigation } from "@react-navigation/core";
 import { getSongAll } from "../config/API";
 import ListMusic from "../components/posts/ListMusic";
 import MusicPlayer from "../components/MusicPlayer";
+import { Audio } from "expo-av";
+import { useDispatch, useSelector } from "react-redux";
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
 
@@ -27,8 +29,10 @@ const SinglePlaylist = ({ route }) => {
   const navigation = useNavigation();
   const [song, setSong] = useState([]);
 
+  const songState = useSelector((state) => state.musicReducer.song);
+  const dispatch = useDispatch();
   const { item } = route.params;
-  console.log(item);
+  console.log("item", item);
   const scrollRef = useAnimatedRef();
 
   const scrollHandler = useScrollViewOffset(scrollRef);
@@ -40,10 +44,62 @@ const SinglePlaylist = ({ route }) => {
     };
   });
 
+  const playHandle = async () => {
+    await songState?.pauseAsync();
+    dispatch({
+      type: "null",
+    });
+    const track = song[0];
+    console.log("track", track);
+    await Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+    });
+
+    const { sound, status } = await Audio.Sound.createAsync(
+      {
+        // uri: "https://kurdsong.storage.iran.liara.space/song/music/1708997285873-935193250.mp3",
+        uri: track.music,
+      },
+      {
+        shouldPlay: true,
+        isLooping: false,
+      },
+      onPlaybackStatusUpdate
+    );
+    onPlaybackStatusUpdate(status);
+    const progress = status;
+    // console.log("Loading Sound", sound._loaded);
+    dispatch({
+      type: "setmusic",
+      value: sound,
+    });
+    dispatch({
+      type: "setlist",
+      value: song,
+    });
+    dispatch({
+      type: "play",
+    });
+    dispatch({
+      type: "settrack",
+      value: track,
+    });
+  };
+  const onPlaybackStatusUpdate = (status) => {
+    if (status.isLoaded && status.isPlaying) {
+      const progress = status.positionMillis / status.durationMillis;
+
+      dispatch({
+        type: "setstatus",
+        value: progress,
+      });
+    }
+  };
+
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
-    setSong(songData.data);
-    setMessage(songData.message);
+    setSong(item.songsarray);
   }, []);
 
   useEffect(() => {
@@ -118,26 +174,21 @@ const SinglePlaylist = ({ route }) => {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-                  onPress={() => {}}
+                  onPress={() => playHandle()}
                 >
-                  <FontAwesome5 name="pause" size={19} color={"#000"} />
+                  <FontAwesome5 name="play" size={19} color={"#000"} />
                 </Pressable>
               </View>
             </View>
             <View style={styles.list}>
               {song.map((item, index) => (
-                <>
-                  <ListMusic item={item} key={index} />
-                  <ListMusic item={item} key={index} />
-                  <ListMusic item={item} key={index} />
-                  <ListMusic item={item} key={index} />
-                </>
+                <ListMusic item={item} key={index} />
               ))}
             </View>
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>
-      <MusicPlayer />
+      <MusicPlayer route={"playlist"} />
     </>
   );
 };

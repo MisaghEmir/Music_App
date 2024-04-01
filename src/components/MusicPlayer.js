@@ -1,10 +1,10 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
-import { AntDesign, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { useDispatch, useSelector } from "react-redux";
 
-const MusicPlayer = () => {
+const MusicPlayer = ({ route }) => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const MusicPlayer = () => {
 
   useEffect(() => {
     // playSound();
-    console.log("Progress",status)
+    console.log("Progress", status);
   });
 
   async function playSound() {
@@ -44,7 +44,7 @@ const MusicPlayer = () => {
         backgroundColor: "#454547",
         position: "absolute",
         borderRadius: 9,
-        bottom: 80,
+        bottom: route === "playlist" ? 10 : 80,
         left: 9,
         zIndex: 999999,
         flexDirection: "row",
@@ -74,7 +74,9 @@ const MusicPlayer = () => {
           </View>
         </Pressable>
         <View style={styles.icons}>
-          <MaterialIcons name="cast" size={23} color={"#fff"} />
+          <Pressable onPress={() => navigation.navigate("listmanu")}>
+            <Entypo name="add-to-list" size={20} color={"#fff"} />
+          </Pressable>
           <AntDesign name="hearto" size={23} color={"#fff"} />
           {play ? (
             <FontAwesome5

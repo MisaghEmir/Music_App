@@ -65,9 +65,6 @@ function HomeScreen() {
     );
     console.log(sound);
     onPlaybackStatusUpdate(status);
-    const progress = status;
-    console.log("status", status);
-    // console.log("Loading Sound", sound._loaded);
     dispatch({
       type: "setmusic",
       value: sound,
@@ -76,12 +73,15 @@ function HomeScreen() {
       type: "play",
     });
     dispatch({
+      type: "setlist",
+      value: song,
+    });
+    dispatch({
       type: "settrack",
       value: track,
     });
   };
   const onPlaybackStatusUpdate = (status) => {
-    console.log(status);
     if (status.isLoaded && status.isPlaying) {
       const progress = status.positionMillis / status.durationMillis;
 
