@@ -2,31 +2,30 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Entypo } from '@expo/vector-icons'
 
-const ListMusic = ({item}) => {
+const SingerRow = ({item}) => {
+    console.log(item)
   return (
     <View style={styles.container}>
         <View style={{flexDirection: "row", gap: 10}}>
             <View>
-                <Image source={{uri: item.image}} style={styles.image} /> 
+                <Image source={{uri: item.avatar}} style={styles.image} /> 
             </View>
             <View style={{justifyContent: "center"}}>
                 <Text style={{color: "#fff", fontSize:15, fontWeight: "700"}}>
                     {item.name}
                 </Text>
                 <View style={{flexDirection:"row",gap: 4, marginTop: 5}}>
-                    <Text style={{color: "#bababa", fontSize:11, backgroundColor: "#555",padding: 1,paddingHorizontal: 3,borderRadius: 3}}>LYRIC</Text>
-                    <Text style={{color: "#bababa", fontSize:11}}>{item.singer}</Text>
+                    <Text style={{color: "#bababa", fontSize:11}}>Artist</Text>
                 </View>
             </View>
         </View>
         <View>
-        <Entypo name="dots-three-vertical" size={17} color={"#bababa"} />
         </View>
     </View>
   )
 }
 
-export default ListMusic
+export default SingerRow
 
 const styles = StyleSheet.create({
     container: {
@@ -36,10 +35,10 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     image: {
-        width: 57,
-        height: 57,
+        width: 67,
+        height: 67,
         borderWidth: 1,
-        borderRadius: 2,
+        borderRadius: 50,
         objectFit: "cover",
         borderColor: "rgba(255,255,255,0.1)",
     }

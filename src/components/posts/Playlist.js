@@ -22,9 +22,14 @@ const Playlist = ({ music }) => {
       <View>
         <Text style={styles.title}>{music.name}</Text>
         <View style={{ color: "#bababa", flexDirection: "row" }}>
+          <Text numberOfLines={2} style={{ color: "#bababa", fontSize: 12, width: 150 }}>
           {music.singersarray.map((item, index) => (
-            <Text style={{ color: "#bababa" }} key={index}>{item.name}, </Text>
-          ))}
+            <>
+              {item.name}
+              {index === music.singersarray.length - 1 ? "" : ", "}
+            </>
+              ))}
+              </Text>
         </View>
       </View>
     </View>

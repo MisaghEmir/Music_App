@@ -13,6 +13,9 @@ import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
   useScrollViewOffset,
+  withTiming,
+  withSpring,
+  useSharedValue,
 } from "react-native-reanimated";
 import { Entypo, FontAwesome5, AntDesign } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,24 +25,42 @@ import ListMusic from "../components/posts/ListMusic";
 import MusicPlayer from "../components/MusicPlayer";
 import { Audio } from "expo-av";
 import { useDispatch, useSelector } from "react-redux";
+import { StatusBar } from "expo-status-bar";
 
 const AnimatedInput = Animated.createAnimatedComponent(TextInput);
 
 const SinglePlaylist = ({ route }) => {
   const navigation = useNavigation();
   const [song, setSong] = useState([]);
+  const [scrollState, setScrollState] = useState(0);
 
   const songState = useSelector((state) => state.musicReducer.song);
+  const playlistState = useSelector((state) => state.playlistReducer.playlist);
+  const playState = useSelector((state) => state.playReducer.play);
+
   const dispatch = useDispatch();
   const { item } = route.params;
   const scrollRef = useAnimatedRef();
 
   const scrollHandler = useScrollViewOffset(scrollRef);
 
-  const inputStyle = useAnimatedStyle(() => {
-    console.log(scrollHandler.value / 100);
+  const scrollHandle = () => {
+    setScrollState(scrollHandler.value / 50);
+  };
+
+  const sv = useSharedValue(0);
+  const width = useSharedValue(0);
+  const height = useSharedValue(0);
+  const playAnimeted = useSharedValue(0);
+
+  const imageStyle = useAnimatedStyle(() => {
+    sv.value = withTiming(scrollState / 8);
+    width.value = withTiming(scrollState / 6);
+    height.value = withTiming(240 - scrollState * 60);
+    playAnimeted.value = withTiming(scrollState / 8);
     return {
-      opacity: scrollHandler.value > 50 ? scrollHandler.value / 1100 : 1,
+      // transform: [{ scaleX: 1 - width.value }, { scaleY: 1 - width.value }],
+      opacity: 1 - sv.value,
     };
   });
 
@@ -83,6 +104,10 @@ const SinglePlaylist = ({ route }) => {
       type: "settrack",
       value: track,
     });
+    dispatch({
+      type: "setplaylist",
+      value: item,
+    });
   };
   const onPlaybackStatusUpdate = (status) => {
     if (status.isLoaded && status.isPlaying) {
@@ -117,15 +142,31 @@ const SinglePlaylist = ({ route }) => {
         style={styles.container}
       >
         <SafeAreaView>
-          <ScrollView
+          <Animated.ScrollView
             ref={scrollRef}
             showsVerticalScrollIndicator={false}
             stickyHeaderIndices={[0]}
+            scrollEventThrottle={5}
+            onScroll={() => scrollHandle()}
           >
-            <Text style={styles.header} onPress={() => navigation.goBack()}>
+            <Text
+              style={{
+                paddingTop: 35,
+                backgroundColor: `rgba(100,100,100,${(scrollState / 10) })`,
+                top: 0,
+              }}
+              onPress={() => navigation.goBack()}
+            >
               <Entypo name="chevron-thin-left" size={19} color={"#fff"} />
             </Text>
-            <View style={styles.inputContainer}>
+            <View
+              style={{
+                marginTop: 20,
+                flexDirection: "row",
+                gap: 7,
+                opacity: 1 - scrollState,
+              }}
+            >
               <AnimatedInput
                 style={styles.input}
                 placeholder={"Find in playlist"}
@@ -138,7 +179,17 @@ const SinglePlaylist = ({ route }) => {
             <View style={styles.imageContainer}>
               <Animated.Image
                 source={{ uri: item.image }}
-                style={styles.image}
+                style={[
+                  {
+                    borderWidth: 1,
+                    borderRadius: 2,
+                    width: "70%",
+                    height: 240,
+
+                    borderColor: "rgba(255,255,255,0.1)",
+                  },
+                  imageStyle,
+                ]}
                 sharedTransitionTag={`image-${item._id}`}
               />
             </View>
@@ -155,7 +206,10 @@ const SinglePlaylist = ({ route }) => {
               </View>
               <Text style={{ color: "#bababa", marginTop: 8 }}>2h 45min</Text>
             </View>
-            <View style={styles.listHeader}>
+
+            <View
+              style={[styles.listHeader, { transform: [{ translateY: 0 }] }]}
+            >
               <View
                 style={{ flexDirection: "row", alignItems: "center", gap: 25 }}
               >
@@ -174,7 +228,11 @@ const SinglePlaylist = ({ route }) => {
                   }}
                   onPress={() => playHandle()}
                 >
-                  <FontAwesome5 name="play" size={19} color={"#000"} />
+                  {playlistState?._id === item._id && playState ? (
+                    <FontAwesome5 name="pause" size={19} color={"#000"} />
+                  ) : (
+                    <FontAwesome5 name="play" size={19} color={"#000"} />
+                  )}
                 </Pressable>
               </View>
             </View>
@@ -183,10 +241,37 @@ const SinglePlaylist = ({ route }) => {
                 <ListMusic item={item} key={index} />
               ))}
             </View>
-          </ScrollView>
+            <View style={styles.list}>
+              {song.map((item, index) => (
+                <ListMusic item={item} key={index} />
+              ))}
+            </View>
+            <View style={styles.list}>
+              {song.map((item, index) => (
+                <ListMusic item={item} key={index} />
+              ))}
+            </View>
+            <View style={styles.list}>
+              {song.map((item, index) => (
+                <ListMusic item={item} key={index} />
+              ))}
+            </View>
+            <View style={styles.list}>
+              {song.map((item, index) => (
+                <ListMusic item={item} key={index} />
+              ))}
+            </View>
+            <View style={styles.list}>
+              {song.map((item, index) => (
+                <ListMusic item={item} key={index} />
+              ))}
+            </View>
+          </Animated.ScrollView>
         </SafeAreaView>
       </LinearGradient>
+
       <MusicPlayer route={"playlist"} />
+      <StatusBar style="light" backgroundColor="rgb(100,100,100)" animated={true} />
     </>
   );
 };
@@ -202,11 +287,14 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 35,
+    backgroundColor: "rgba(255,255,255,0.0)",
+    top: 0,
   },
   inputContainer: {
     marginTop: 20,
     flexDirection: "row",
     gap: 7,
+    opacity: 0,
   },
   input: {
     backgroundColor: "#555",
@@ -230,6 +318,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     marginTop: 40,
+    height: 240,
   },
   image: {
     width: "71%",
@@ -242,9 +331,12 @@ const styles = StyleSheet.create({
   titleContainer: {
     marginTop: 30,
   },
+
   listHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
+    width: "100%",
+    transform: [{ translateY: 0 }],
   },
 });

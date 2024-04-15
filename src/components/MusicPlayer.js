@@ -1,10 +1,13 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect,useState } from "react";
 import { AntDesign, Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
 import { useDispatch, useSelector } from "react-redux";
+import SingelScreen from "../screen/SingelScreen";
 
 const MusicPlayer = ({ route }) => {
+  const [isModal, setIsModal] = useState(false);
+
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -14,12 +17,9 @@ const MusicPlayer = ({ route }) => {
   const track = useSelector((state) => state.trackReducer.track);
   console.log(track);
 
-
   useEffect(() => {
     // playSound();
   });
-
-
 
   async function playSound() {
     if (!play) {
@@ -61,7 +61,7 @@ const MusicPlayer = ({ route }) => {
           padding: 6,
         }}
       >
-        <Pressable onPress={() => navigation.navigate("Single")}>
+        <Pressable onPress={() => setIsModal(true)}>
           <View style={styles.imageContainer}>
             <View>
               <Image source={{ uri: track?.image }} style={styles.image} />
@@ -117,6 +117,17 @@ const MusicPlayer = ({ route }) => {
           ></View>
         )}
       </View>
+      <Modal
+        animationType="slide"
+        visible={isModal}
+        style={{ margin: 0, backgroundColor: "#A95745" }}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setIsModal(false);
+        }}
+      >
+        <SingelScreen closeHandle={() => setIsModal(false)} />
+      </Modal>
     </View>
   );
 };

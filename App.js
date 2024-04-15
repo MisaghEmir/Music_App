@@ -6,19 +6,21 @@ import { NavigationContainer } from "@react-navigation/native";
 import StackNavigator from "./src/navigators/StackNavigator";
 import Topbar from "./src/components/home/Topbar";
 import { PlayContext } from "./src/context/PlayContext";
-import { Provider } from "react-redux"
+import { Provider } from "react-redux";
 import store from "./src/redux/Store";
-
+import React, { Component, Fragment } from "react";
 
 export default function App() {
   return (
     <Provider store={store}>
-    <PlayContext>
-      <NavigationContainer>
-        <StackNavigator />
-        <StatusBar style="light" backgroundColor="black" animated={true} />
-      </NavigationContainer>
-    </PlayContext>
+      <PlayContext>
+        <Fragment>
+          <NavigationContainer>
+            <StackNavigator />
+            <StatusBar style="light" backgroundColor="black" animated={true} />
+          </NavigationContainer>
+        </Fragment>
+      </PlayContext>
     </Provider>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import { StatusBar } from "expo-status-bar";
 import {
   View,
   StyleSheet,
@@ -9,9 +8,9 @@ import {
   ScrollView,
   Pressable,
   Touchable,
-  TouchableOpacity,
+  StatusBar,
 } from "react-native";
-import { getPlaylistAll, getSongAll } from "../config/API";
+import { getAlbumAll, getPlaylistAll, getSongAll } from "../config/API";
 import Music from "../components/posts/Music";
 import Topbar from "../components/home/Topbar";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,10 +18,12 @@ import { useNavigation } from "@react-navigation/core";
 import Animated from "react-native-reanimated";
 import { Audio } from "expo-av";
 import Playlist from "../components/posts/Playlist";
+import Album from "../components/album/Album";
 
 function HomeScreen() {
   const [song, setSong] = useState([]);
   const [playlist, setPlaylist] = useState([]);
+  const [album, setAlbum] = useState([]);
   const [message, setMessage] = useState("amir");
 
   const navigator = useNavigation();
@@ -32,9 +33,11 @@ function HomeScreen() {
   const dispatch = useDispatch();
   const getSong = useCallback(async () => {
     const songData = await getSongAll();
-    const playlistData = await getPlaylistAll()
+    const playlistData = await getPlaylistAll();
+    const albumsData = await getAlbumAll();
     setSong(songData.data);
     setPlaylist(playlistData.data);
+    setAlbum(albumsData.data);
     setMessage(songData.message);
   }, []);
 
@@ -116,7 +119,7 @@ function HomeScreen() {
           </Text>
           <FlatList
             horizontal={true}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 20 }}
             showsHorizontalScrollIndicator={false}
             data={song}
             renderItem={({ item }) => (
@@ -140,7 +143,7 @@ function HomeScreen() {
           </Text>
           <FlatList
             horizontal={true}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 20 }}
             showsHorizontalScrollIndicator={false}
             data={playlist}
             renderItem={({ item }) => (
@@ -166,19 +169,24 @@ function HomeScreen() {
           </Text>
           <FlatList
             horizontal={true}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 20, marginBottom: 150 }}
             showsHorizontalScrollIndicator={false}
-            data={song}
+            data={album}
             renderItem={({ item }) => (
-              <Pressable onPress={() => selectMusic(item)}>
-              <Music music={item} />
-            </Pressable>
+              <Pressable >
+                <Album album={item} />
+              </Pressable>
             )}
             keyExtractor={(item) => item._id}
           />
         </View>
       </ScrollView>
-      <StatusBar style="black" backgroundColor="black" animated={true} />
+      <StatusBar
+        style="black"
+        barStyle="dark-content"
+        backgroundColor="black"
+        animated={true}
+      />
     </SafeAreaView>
   );
 }
@@ -186,9 +194,9 @@ function HomeScreen() {
 export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     paddingVertical: 10,
-    backgroundColor: "#000",
+    backgroundColor: "rgb(15,15,15)",
     flex: 1,
   },
   labelContainer: {
@@ -197,7 +205,7 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
     paddingVertical: 11,
-    marginTop: 20,
+    marginTop: 10,
   },
   label: {
     display: "flex",

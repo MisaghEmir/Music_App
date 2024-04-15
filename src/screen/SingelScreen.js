@@ -1,11 +1,14 @@
 import {
   Image,
+  Modal,
   Pressable,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   Touchable,
   View,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
@@ -24,13 +27,15 @@ import { getSongAll } from "../config/API";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/core";
 import { Audio } from "expo-av";
+import Lyrics from "../components/Lyrics";
 
 // import SetupPlayer from "../../SetupPlayer";
 // import TrackPlayer from "react-native-track-player";
 
-const SingelScreen = () => {
+const SingelScreen = ({ closeHandle }) => {
   const [song, setSong] = useState([]);
   const [message, setMessage] = useState("amir");
+  const [isModal, setIsModal] = useState(false);
   const songState = useSelector((state) => state.musicReducer.song);
   const play = useSelector((state) => state.playReducer.play);
   const track = useSelector((state) => state.trackReducer.track);
@@ -93,7 +98,6 @@ const SingelScreen = () => {
       staysActiveInBackground: true,
     });
 
-  
     dispatch({
       type: "setlist",
       value: list,
@@ -190,90 +194,176 @@ const SingelScreen = () => {
       ]}
       style={styles.container}
     >
-      <Header />
-      <Image
-        source={{ uri: track?.image }}
-        style={{
-          width: "100%",
-          height: 320,
-          borderRadius: 2,
-          marginVertical: 42,
-        }}
-      />
-      <View style={styles.player}>
-        <View>
-          <Text style={{ color: "#fff" }}>{track.name}</Text>
-          <Text style={{ color: "#bababa" }}>{track?.singer}</Text>
-        </View>
-        <View style={styles.progressContainer}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Header closeHandle={closeHandle} />
+        <Image
+          source={{ uri: track?.image }}
+          style={{
+            width: "100%",
+            height: 320,
+            borderRadius: 2,
+            marginVertical: 42,
+          }}
+        />
+        <View style={styles.player}>
+          <View>
+            <Text style={{ color: "#fff" }}>{track.name}</Text>
+            <Text style={{ color: "#bababa" }}>{track?.singer}</Text>
+          </View>
+          <View style={styles.progressContainer}>
+            <View
+              style={{
+                width: status ? `${status * 100}%` : "0%",
+                height: "100%",
+                backgroundColor: "#fff",
+              }}
+            ></View>
+            <Pressable
+              style={{
+                position: "absolute",
+                width: 12,
+                height: 12,
+                borderRadius: 50,
+                backgroundColor: "#fff",
+                left: `${status * 100}%`,
+                top: -4,
+              }}
+            ></Pressable>
+          </View>
+          <View></View>
+          <View style={styles.play}>
+            <View>
+              <AntDesign name="hearto" size={20} color={"#fff"} />
+            </View>
+            <Pressable onPress={() => handlePrevTrack()}>
+              <AntDesign name="stepbackward" size={30} color={"#fff"} />
+            </Pressable>
+            <Pressable
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 50,
+                backgroundColor: "#fff",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onPress={() => playSound()}
+            >
+              {play ? (
+                <FontAwesome5 name="pause" size={20} color={"#000"} />
+              ) : (
+                <FontAwesome5 name="play" size={20} color={"#000"} />
+              )}
+            </Pressable>
+            <Pressable onPress={() => handleNextTrack()}>
+              <AntDesign name="stepforward" size={30} color={"#fff"} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("listmanu")}>
+              <Entypo name="add-to-list" size={20} color={"#fff"} />
+            </Pressable>
+          </View>
           <View
             style={{
-              width: status ? `${status * 100}%` : "0%",
-              height: "100%",
-              backgroundColor: "#fff",
-            }}
-          ></View>
-          <Pressable
-            style={{
-              position: "absolute",
-              width: 12,
-              height: 12,
-              borderRadius: 50,
-              backgroundColor: "#fff",
-              left: `${status * 100}%`,
-              top: -4,
-            }}
-          ></Pressable>
-        </View>
-        <View></View>
-        <View style={styles.play}>
-          <View>
-            <AntDesign name="hearto" size={20} color={"#fff"} />
-          </View>
-          <Pressable onPress={() => handlePrevTrack()}>
-            <AntDesign name="stepbackward" size={30} color={"#fff"} />
-          </Pressable>
-          <Pressable
-            style={{
-              width: 70,
-              height: 70,
-              borderRadius: 50,
-              backgroundColor: "#fff",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 20,
               alignItems: "center",
-              justifyContent: "center",
             }}
-            onPress={() => playSound()}
           >
-            {play ? (
-              <FontAwesome5 name="pause" size={20} color={"#000"} />
-            ) : (
-              <FontAwesome5 name="play" size={20} color={"#000"} />
-            )}
-          </Pressable>
-          <Pressable onPress={() => handleNextTrack()}>
-            <AntDesign name="stepforward" size={30} color={"#fff"} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate("listmanu")}>
-            <Entypo name="add-to-list" size={20} color={"#fff"} />
-          </Pressable>
+            <View>
+              <MaterialIcons name="cast" size={20} color={"#fff"} />
+            </View>
+            <View>
+              <EvilIcons name="share-google" size={25} color={"#fff"} />
+            </View>
+          </View>
         </View>
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 20,
-            alignItems: "center",
+            width: "100%",
+            height: 400,
+            borderRadius: 7,
+            backgroundColor: "#A95745",
+            padding: 20,
+            paddingVertical: 15,
+            marginTop: 40,
+            marginBottom: 62,
           }}
         >
-          <View>
-            <MaterialIcons name="cast" size={20} color={"#fff"} />
+          <View
+            style={{
+              justifyContent: "space-between",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 15, color: "#fff", fontWeight: "700" }}>
+              Lyrics
+            </Text>
+            <Text
+              onPress={() => setIsModal(true)}
+              style={{ borderRadius: 50, backgroundColor: "gray", padding: 6}}
+            >
+              <Entypo name="resize-full-screen" size={13} color="#fff" />
+            </Text>
           </View>
-          <View>
-            <EvilIcons name="share-google" size={25} color={"#fff"} />
+          <ScrollView>
+            {track.lyric.map((item, index) => (
+              <Text
+                numberOfLines={8}
+                style={{ fontSize: 21, marginVertical: 10, fontWeight: "700" }}
+              >
+                {item.lyrics}
+              </Text>
+            ))}
+          </ScrollView>
+          <View
+            style={{
+              justifyContent: "flex-end",
+              flexDirection: "row",
+              alignItems: "flex-end",
+              paddingVertical: 10,
+            }}>
+            <Pressable
+              style={{
+                flexDirection: "row",
+                borderWidth: 0.2,
+                borderColor: "#fff",
+                alignItems: "center",
+                gap: 5,
+                paddingHorizontal: 25,
+                paddingVertical: 5,
+                borderRadius: 15
+              }}
+            
+            >
+              <Text>
+              <EvilIcons name="share-google" size={13} color="#fff" />
+              </Text>
+              <Text style={{ fontSize: 11, color: "#fff", fontWeight: "700" }}>
+                SHARE
+              </Text>
+            </Pressable>
           </View>
+       
         </View>
-      </View>
-      <StatusBar style="light" backgroundColor="black" animated={true} />
+        <Modal
+          animationType="slide"
+          visible={isModal}
+          style={{ margin: 0, backgroundColor: "#A95745" }}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setIsModal(false);
+          }}
+        >
+          <Lyrics closeHandle={() => setIsModal(false)} />
+        </Modal>
+      </ScrollView>
+      <StatusBar
+        style="light"
+        backgroundColor="rgb(100,100,100)"
+        animated={true}
+      />
     </LinearGradient>
   );
 };
@@ -283,7 +373,7 @@ export default SingelScreen;
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 25,
-    paddingVertical: 10,
+    paddingVertical: 0,
     backgroundColor: "#000",
     flex: 1,
   },
@@ -296,7 +386,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 4,
     position: "relative",
-    backgroundColor: "#bababa",
+    backgroundColor: "#343434",
   },
   progress: {
     width: "30%",
