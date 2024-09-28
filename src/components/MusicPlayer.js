@@ -15,7 +15,8 @@ const MusicPlayer = ({ route }) => {
   const song = useSelector((state) => state.musicReducer.song);
   const status = useSelector((state) => state.musicReducer.status);
   const track = useSelector((state) => state.trackReducer.track);
-  console.log(track);
+  const show = useSelector((state) => state.showPlayer.show);
+ 
 
   useEffect(() => {
     // playSound();
@@ -43,7 +44,7 @@ const MusicPlayer = ({ route }) => {
         backgroundColor: "#454547",
         position: "absolute",
         borderRadius: 9,
-        bottom: route === "playlist" ? 10 : 80,
+        bottom: show ? route === "playlist" ? 10 : 80 : -80,
         left: 9,
         zIndex: 999999,
         flexDirection: "row",
@@ -122,7 +123,6 @@ const MusicPlayer = ({ route }) => {
         visible={isModal}
         style={{ margin: 0, backgroundColor: "#A95745" }}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
           setIsModal(false);
         }}
       >

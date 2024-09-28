@@ -10,7 +10,12 @@ import {
   Touchable,
   StatusBar,
 } from "react-native";
-import { getAlbumAll, getPlaylistAll, getSongAll } from "../config/API";
+import {
+  getAlbumAll,
+  getCategoryAll,
+  getPlaylistAll,
+  getSongAll,
+} from "../config/API";
 import Music from "../components/posts/Music";
 import Topbar from "../components/home/Topbar";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +30,7 @@ function HomeScreen() {
   const [playlist, setPlaylist] = useState([]);
   const [album, setAlbum] = useState([]);
   const [message, setMessage] = useState("amir");
+  const [catagorys, setCatagorys] = useState([]);
 
   const navigator = useNavigation();
 
@@ -35,10 +41,12 @@ function HomeScreen() {
     const songData = await getSongAll();
     const playlistData = await getPlaylistAll();
     const albumsData = await getAlbumAll();
+    const categoryData = await getCategoryAll();
     setSong(songData.data);
     setPlaylist(playlistData.data);
     setAlbum(albumsData.data);
     setMessage(songData.message);
+    setCatagorys(categoryData.data);
   }, []);
 
   useEffect(() => {
@@ -91,6 +99,10 @@ function HomeScreen() {
       dispatch({
         type: "setstatus",
         value: progress,
+      });
+      dispatch({
+        type: "settime",
+        value: status.positionMillis,
       });
     }
   };
@@ -145,12 +157,36 @@ function HomeScreen() {
             horizontal={true}
             style={{ marginTop: 20 }}
             showsHorizontalScrollIndicator={false}
-            data={playlist}
+            data={album}
+            renderItem={({ item }) => (
+              <Pressable>
+                <Album album={item} />
+              </Pressable>
+            )}
+            keyExtractor={(item) => item._id}
+          />
+        </View>
+        <View>
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 24,
+              fontWeight: "700",
+              marginTop: 20,
+            }}
+          >
+            Fresh new music
+          </Text>
+          <FlatList
+            horizontal={true}
+            style={{ marginTop: 20 }}
+            showsHorizontalScrollIndicator={false}
+            data={catagorys}
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => navigator.navigate("SinglePlaylist", { item })}
               >
-                <Playlist music={item} />
+                <Album album={item} />
               </Pressable>
             )}
             keyExtractor={(item) => item._id}
@@ -171,10 +207,12 @@ function HomeScreen() {
             horizontal={true}
             style={{ marginTop: 20, marginBottom: 150 }}
             showsHorizontalScrollIndicator={false}
-            data={album}
+            data={playlist}
             renderItem={({ item }) => (
-              <Pressable >
-                <Album album={item} />
+              <Pressable
+                onPress={() => navigator.navigate("SinglePlaylist", { item })}
+              >
+                <Playlist music={item} />
               </Pressable>
             )}
             keyExtractor={(item) => item._id}

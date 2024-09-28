@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View,Pressable } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  Entypo,
   FontAwesome,
-  Feather,
+  Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
 import MusicPlayer from "./MusicPlayer";
+import { useNavigation } from "@react-navigation/core";
 
 const BarButton = () => {
+  const navigator = useNavigation();
   return (
     <>
       <MusicPlayer />
@@ -23,19 +24,58 @@ const BarButton = () => {
         ]}
         style={styles.container}
       >
+        <Pressable style={styles.item} 
+         onPress={() => navigator.navigate("Home")}>
+          <MaterialIcons name="home-filled" size={24} color="#bababa" />
+          <Text
+            style={{
+              color:"#bababa",
+              fontSize: 11,
+              fontWeight: "900",
+              marginTop: 5,
+            }}
+          >
+            Home
+          </Text>
+        </Pressable>
         <View style={styles.item}>
-          <MaterialIcons name="home-filled" size={30} color="#fff" />
-          <Text style={styles.itemText}>Home</Text>
+          <FontAwesome name="search" size={24} color="#bababa"  />
+          <Text
+            style={{
+              color:"#bababa",
+              fontSize: 11,
+              fontWeight: "900",
+              marginTop: 5,
+            }}
+          >
+            Search
+          </Text>
         </View>
         <View style={styles.item}>
-          <FontAwesome name="search" size={28} color="#fff" />
-          <Text style={styles.itemText}>Search</Text>
+          <MaterialIcons name="video-collection" size={24} color="#fff"  />
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 11,
+              fontWeight: "900",
+              marginTop: 5,
+            }}
+          >
+            Library
+          </Text>
         </View>
         <View style={styles.item}>
-          <Text style={styles.itemText}>Bar</Text>
-        </View>
-        <View style={styles.item}>
-          <Text style={styles.itemText}>Bar</Text>
+          <Ionicons name="person-outline" size={24} color="#bababa"  />
+          <Text
+            style={{
+              color:"#bababa",
+              fontSize: 11,
+              fontWeight: "900",
+              marginTop: 5,
+            }}
+          >
+            Profile
+          </Text>
         </View>
       </LinearGradient>
     </>
@@ -54,6 +94,12 @@ const styles = StyleSheet.create({
     zIndex: 999999,
     flexDirection: "row",
     overflow: "hidden",
+    elevation: 5,
+    borderRadius: 0,
+    borderWidth: 0,
+    borderColor: "#000",
+    shadowOpacity: 0,
+    height: 80,
   },
   item: {
     justifyContent: "center",

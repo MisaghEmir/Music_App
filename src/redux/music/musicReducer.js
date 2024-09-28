@@ -1,6 +1,7 @@
 const initialState = {
     song: null,
-    status: 0
+    status: 0,
+    time: 0,
   };
   
   export const musicReducer = (state = initialState, action) => {
@@ -14,6 +15,11 @@ const initialState = {
         return {
           ...state,
           status: action.value,
+        };
+      case "settime":
+        return {
+          ...state,
+          time: action.value,
         };
       case "null":
         return {

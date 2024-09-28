@@ -3,7 +3,6 @@ import React from "react";
 import Animated from "react-native-reanimated";
 
 const Music = ({ music }) => {
- 
   return (
     <View style={styles.container}>
       <View>
@@ -21,8 +20,30 @@ const Music = ({ music }) => {
         />
       </View>
       <View>
-        <Text style={styles.title}>{music.name}</Text>
-        <Text style={{ color: "#bababa" }}>{music.singer}</Text>
+        <Text numberOfLines={1} style={styles.title}>
+          {music.name}
+        </Text>
+        <View style={{ flexDirection: "row", gap: 4, marginTop: 5,alignItems: "center" }}>
+          <Text
+            style={{
+              color: "#000",
+              fontSize: 9,
+              fontWeight: "900",
+              backgroundColor: "gray",
+              padding: 1,
+              paddingHorizontal: 3,
+              borderRadius: 3,
+            }}
+          >
+            LYRICS
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={{ color: "#bababa", fontSize: 12.1 }}
+          >
+            {music.singer}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -37,5 +58,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     marginTop: 10,
+    width: 143,
   },
 });

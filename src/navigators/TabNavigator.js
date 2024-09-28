@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   Entypo,
   FontAwesome,
@@ -14,12 +15,38 @@ import SinglePlaylist from "../screen/SinglePlaylist";
 import SearchScreen from "../screen/SearchScreen";
 import LibararyScreen from "../screen/LibararyScreen";
 import { LinearGradient } from "expo-linear-gradient";
+import SingerScreen from '../screen/SingerScreen';
+import PersonScreen from "../screen/PersonScreen";
+import LoginScreen from "../screen/LoginScreen";
+
+
+const LibraryStack = createNativeStackNavigator();
+
+function LibraryStackScreen() {
+  return (
+    <LibraryStack.Navigator screenOptions={{ headerShown: false }}>
+      <LibraryStack.Screen name="Library" component={LibararyScreen} />
+      <LibraryStack.Screen name="Singer" component={SingerScreen} />
+    </LibraryStack.Navigator>
+  );
+}
+
+const PersonStack = createNativeStackNavigator();
+
+function PersonStackScreen() {
+  return (
+    <PersonStack.Navigator screenOptions={{ headerShown: false }}>
+      <PersonStack.Screen name="Person" component={PersonScreen} />
+      <PersonStack.Screen name="Login" component={LoginScreen} />
+    </PersonStack.Navigator>
+  );
+}
 
 function TabNavigator() {
   const Tab = createBottomTabNavigator();
   return (
     <>
-      <MusicPlayer route={"tab"} />
+      <MusicPlayer route={"tab"}   />
 
       <Tab.Navigator
         screenOptions={{
@@ -42,6 +69,7 @@ function TabNavigator() {
           },
         }}
       >
+       
         <Tab.Screen
           name="Home"
           component={HomeScreen}
@@ -75,13 +103,14 @@ function TabNavigator() {
                   }}
                 >
                   <MaterialIcons name="home-filled" size={size} color={color} />
+                  <Text style={{color: color, fontSize: size - 14, fontWeight: "900", marginTop: 5}}>Home</Text>
                 </View>
               </LinearGradient>
             ),
           }}
         />
 
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Search"
           component={SearchScreen}
           options={{
@@ -113,6 +142,7 @@ function TabNavigator() {
                   }}
                 >
                   <FontAwesome name="search" size={size} color={color} />
+                  <Text style={{color: color, fontSize: size - 14, fontWeight: "900", marginTop: 5}}>Search</Text>
                 </View>
               </LinearGradient>
             ),
@@ -120,7 +150,7 @@ function TabNavigator() {
         />
         <Tab.Screen
           name="Library"
-          component={LibararyScreen}
+          component={LibraryStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <LinearGradient
@@ -154,14 +184,15 @@ function TabNavigator() {
                     size={size}
                     color={color}
                   />
+                   <Text style={{color: color, fontSize: size - 14, fontWeight: "900", marginTop: 5}}>Library</Text>
                 </View>
               </LinearGradient>
             ),
           }}
         />
         <Tab.Screen
-          name="Shopping"
-          component={HomeScreen}
+          name="Person"
+          component={PersonStackScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
               <LinearGradient
@@ -191,11 +222,12 @@ function TabNavigator() {
                   }}
                 >
                   <Ionicons name="person-outline" size={size} color={color} />
+                  <Text style={{color: color, fontSize: size - 14, fontWeight: "900", marginTop: 5}}>Profile</Text>
                 </View>
               </LinearGradient>
             ),
           }}
-        />
+        /> */}
         {/* <Tab.Screen
           name="profile"
           component={HomeScreen}

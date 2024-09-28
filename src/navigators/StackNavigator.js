@@ -16,7 +16,6 @@ function StackNavigator() {
       <Stack.Screen name="Single" component={SingelScreen} />
       <Stack.Screen name="SinglePlaylist" component={SinglePlaylist} />
       <Stack.Screen name="listmanu" component={ListMenuScreen} />
-      <Stack.Screen name="Singer" component={SingerScreen} />
       <Stack.Screen name="Recent" component={RecentMusic} />
       <Stack.Screen name="SearchBoxScreen" component={SearchBoxScreen} />
     </Stack.Navigator>

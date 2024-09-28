@@ -17,6 +17,7 @@ import SingerRow from "../components/singer/SingerRow";
 import Music from "../components/posts/Music";
 import PlaylistRow from "../components/playlist/PlaylistRow";
 import { useNavigation } from "@react-navigation/core";
+import { useDispatch } from "react-redux";
 
 const SearchScreen = () => {
   const [songs, setSongs] = useState([]);
@@ -39,6 +40,8 @@ const SearchScreen = () => {
   useEffect(() => {
     getSong();
   }, [getSong]);
+
+  const dispatch = useDispatch();
 
   const searchHandle = (value) => {
     let searchInaput = value;
@@ -80,8 +83,12 @@ const SearchScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="What do you want to listen to?"
-            onFocus={() => setFucos(true)}
-            onBlur={() => setFucos(false)}
+            onFocus={() => {setFucos(true),  dispatch({
+              type: "hidden",
+            });}}
+            onBlur={() => {setFucos(false),  dispatch({
+              type: "show",
+            });}}
             onChangeText={searchHandle}
           />
           <View style={styles.icon}>

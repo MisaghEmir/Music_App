@@ -1,15 +1,17 @@
 import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import { useDispatch, useSelector } from "react-redux";
 import { Entypo, EvilIcons, FontAwesome5 } from "@expo/vector-icons";
+import RangeSlider from "react-native-range-slider";
 
 const Lyrics = ({ closeHandle }) => {
   const track = useSelector((state) => state.trackReducer.track);
   const playlistState = useSelector((state) => state.playlistReducer.playlist);
-  const status = useSelector((state) => state.musicReducer.status);
+  const time = useSelector((state) => state.musicReducer.time);
   const play = useSelector((state) => state.playReducer.play);
   const songState = useSelector((state) => state.musicReducer.song);
+  const status = useSelector((state) => state.musicReducer.status);
 
   const dispatch = useDispatch();
 
@@ -31,13 +33,22 @@ const Lyrics = ({ closeHandle }) => {
   }
 
   const change_time = (time) => {
-    console.log(time)
+    var min = Math.floor(time / 60000);
+    var second = Math.floor((time % 60000) / 1000);
+
+    return `${min < 10 ? `0${min}` : min}:${
+      second < 10 ? `0${second}` : second
+    }`;
+  };
+
+  const change_durtion = (time) => {
     var min = parseInt(time / 60);
     var second = parseInt(time - min * 60);
 
     if (second > 9) return min.toString() + ":" + second.toString();
     else return min.toString() + ":0" + second.toString();
   };
+
   return (
     <View style={styles.container}>
       <View
@@ -82,16 +93,32 @@ const Lyrics = ({ closeHandle }) => {
       </View>
       <ScrollView>
         {track.lyric.map((item, index) => (
-          <Text  numberOfLines={8}
-          style={{ fontSize: 21, marginVertical: 10, fontWeight: "700" }}>
+          <Text
+            numberOfLines={8}
+            style={{
+              fontSize: 21,
+              marginVertical: 10,
+              fontWeight: "700",
+              color:
+                Math.floor((time % 60000) / 1000) >= item.timeStart &&
+                Math.floor((time % 60000) / 1000) <= item.timeEnd
+                  ? "#fff"
+                  : "#000",
+            }}
+          >
             {item.lyrics}
           </Text>
         ))}
-      
+
         <StatusBar style="light" backgroundColor="#A95745" animated={true} />
       </ScrollView>
       <View>
-        <View style={styles.progressContainer}>
+        {/* <Pressable
+          style={styles.progressContainer}
+          onPress={(e) => {
+            console.log(e.target);
+          }}
+        >
           <View
             style={{
               width: status ? `${status * 100}%` : "0%",
@@ -99,14 +126,19 @@ const Lyrics = ({ closeHandle }) => {
               backgroundColor: "#fff",
             }}
           ></View>
-        </View>
+        </Pressable> */}
+     
         <View style={styles.timeContainer}>
-          <Text style={{ fontSize: 12, color: "#fff" }}>{change_time(status * 160)}</Text>
-          <Text style={{ fontSize: 12, color: "#fff" }}>{change_time(track.duration)}</Text>
+          <Text style={{ fontSize: 12, color: "#fff" }}>
+            {change_time(time)}
+          </Text>
+          <Text style={{ fontSize: 12, color: "#fff" }}>
+            {change_durtion(track.duration)}
+          </Text>
         </View>
         <View style={styles.playContainer}>
-          <View ></View>
-          <View >
+          <View></View>
+          <View>
             <Pressable
               style={{
                 width: 70,
@@ -125,8 +157,8 @@ const Lyrics = ({ closeHandle }) => {
               )}
             </Pressable>
           </View>
-          <View >
-          <Entypo  name="share" size={27} color="#fff" />
+          <View>
+            <Entypo name="share" size={27} color="#fff" />
           </View>
         </View>
       </View>
@@ -143,7 +175,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#A95745",
     padding: 20,
-    paddingTop: 5
+    paddingTop: 5,
   },
   progressContainer: {
     marginVertical: 7,
@@ -175,9 +207,9 @@ const styles = StyleSheet.create({
   },
   playContainer: {
     flexDirection: "row",
-    justifyContent:"flex-end",
+    justifyContent: "flex-end",
     alignItems: "center",
     gap: 100,
-    paddingVertical: 0
+    paddingVertical: 0,
   },
 });

@@ -219,7 +219,6 @@ const SingerScreen = ({ route }) => {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </Text>
       </View>
-      <BarButton />
       <StatusBar
         style="light"
         backgroundColor={`rgba(30,30,30,${scroll - 1.5})`}

@@ -79,7 +79,7 @@ const LibararyScreen = () => {
           <FlatList
             style={{ marginTop: 20 }}
             showsHorizontalScrollIndicator={false}
-            data={singers}
+            data={singers.slice(0, 3)}
             renderItem={({ item }) => (
               <Pressable onPress={() => navigator.navigate("Singer", { item })}>
                 <SingerRow item={item} />

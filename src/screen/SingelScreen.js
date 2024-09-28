@@ -41,7 +41,7 @@ const SingelScreen = ({ closeHandle }) => {
   const track = useSelector((state) => state.trackReducer.track);
   const list = useSelector((state) => state.listReducer.list);
   const status = useSelector((state) => state.musicReducer.status);
-  console.log(songState);
+  const time = useSelector((state) => state.musicReducer.time);
 
   const navigation = useNavigation();
 
@@ -56,8 +56,6 @@ const SingelScreen = ({ closeHandle }) => {
 
   async function playSound() {
     if (!play) {
-      console.log(songState);
-      console.log(play);
       dispatch({
         type: "play",
       });
@@ -66,7 +64,7 @@ const SingelScreen = ({ closeHandle }) => {
       dispatch({
         type: "pause",
       });
-      console.log("Pause Sound");
+
       await songState.pauseAsync();
     }
   }
@@ -179,7 +177,29 @@ const SingelScreen = ({ closeHandle }) => {
         type: "setstatus",
         value: progress,
       });
+      dispatch({
+        type: "settime",
+        value: status.positionMillis,
+      });
     }
+  };
+
+  const change_time = (time) => {
+    var min = Math.floor(time / 60000);
+    var second = Math.floor((time % 60000) / 1000);
+    if (time)
+      return `${min < 10 ? `0${min}` : min}:${
+        second < 10 ? `0${second}` : second
+      }`;
+    else return "00:00";
+  };
+
+  const change_durtion = (time) => {
+    var min = parseInt(time / 60);
+    var second = parseInt(time - min * 60);
+
+    if (second > 9) return min.toString() + ":" + second.toString();
+    else return min.toString() + ":0" + second.toString();
   };
 
   return (
@@ -203,6 +223,7 @@ const SingelScreen = ({ closeHandle }) => {
             height: 320,
             borderRadius: 2,
             marginVertical: 42,
+            marginBottom: 20,
           }}
         />
         <View style={styles.player}>
@@ -210,12 +231,18 @@ const SingelScreen = ({ closeHandle }) => {
             <Text style={{ color: "#fff" }}>{track.name}</Text>
             <Text style={{ color: "#bababa" }}>{track?.singer}</Text>
           </View>
-          <View style={styles.progressContainer}>
+          <View
+            style={styles.progressContainer}
+            onPress={() => console.log("hello")}
+          >
             <View
               style={{
                 width: status ? `${status * 100}%` : "0%",
                 height: "100%",
                 backgroundColor: "#fff",
+              }}
+              onPress={() => {
+                console.log("hi");
               }}
             ></View>
             <Pressable
@@ -228,9 +255,17 @@ const SingelScreen = ({ closeHandle }) => {
                 left: `${status * 100}%`,
                 top: -4,
               }}
+              onPress={() => console.log("hello")}
             ></Pressable>
           </View>
-          <View></View>
+          <View style={styles.timeContainer}>
+            <Text style={{ fontSize: 12, color: "#fff" }}>
+              {change_time(time)}
+            </Text>
+            <Text style={{ fontSize: 12, color: "#fff" }}>
+              {change_durtion(track.duration)}
+            </Text>
+          </View>
           <View style={styles.play}>
             <View>
               <AntDesign name="hearto" size={20} color={"#fff"} />
@@ -281,7 +316,7 @@ const SingelScreen = ({ closeHandle }) => {
         <View
           style={{
             width: "100%",
-            height: 400,
+            height: 450,
             borderRadius: 7,
             backgroundColor: "#A95745",
             padding: 20,
@@ -302,7 +337,7 @@ const SingelScreen = ({ closeHandle }) => {
             </Text>
             <Text
               onPress={() => setIsModal(true)}
-              style={{ borderRadius: 50, backgroundColor: "gray", padding: 6}}
+              style={{ borderRadius: 50, backgroundColor: "gray", padding: 6 }}
             >
               <Entypo name="resize-full-screen" size={13} color="#fff" />
             </Text>
@@ -310,6 +345,7 @@ const SingelScreen = ({ closeHandle }) => {
           <ScrollView>
             {track.lyric.map((item, index) => (
               <Text
+                key={index}
                 numberOfLines={8}
                 style={{ fontSize: 21, marginVertical: 10, fontWeight: "700" }}
               >
@@ -323,7 +359,8 @@ const SingelScreen = ({ closeHandle }) => {
               flexDirection: "row",
               alignItems: "flex-end",
               paddingVertical: 10,
-            }}>
+            }}
+          >
             <Pressable
               style={{
                 flexDirection: "row",
@@ -333,19 +370,17 @@ const SingelScreen = ({ closeHandle }) => {
                 gap: 5,
                 paddingHorizontal: 25,
                 paddingVertical: 5,
-                borderRadius: 15
+                borderRadius: 15,
               }}
-            
             >
               <Text>
-              <EvilIcons name="share-google" size={13} color="#fff" />
+                <EvilIcons name="share-google" size={13} color="#fff" />
               </Text>
               <Text style={{ fontSize: 11, color: "#fff", fontWeight: "700" }}>
                 SHARE
               </Text>
             </Pressable>
           </View>
-       
         </View>
         <Modal
           animationType="slide"
@@ -387,6 +422,7 @@ const styles = StyleSheet.create({
     height: 4,
     position: "relative",
     backgroundColor: "#343434",
+    marginBottom: 0,
   },
   progress: {
     width: "30%",
@@ -403,6 +439,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     left: "30%",
     top: -4,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
   },
   play: {
     flexDirection: "row",
